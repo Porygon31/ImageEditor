@@ -1,0 +1,27 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+project.assets.json
+
+# Rider / ReSharper
+.idea/
+_ReSharper*/
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Editor/tooling local config
+.claude/
