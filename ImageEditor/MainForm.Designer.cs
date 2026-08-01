@@ -85,9 +85,6 @@ namespace ImageEditor
             this.pnlSidebarHeader.SuspendLayout();
             this.pnlLogo.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // pnlPreviewArea
-            // 
             this.pnlPreviewArea.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
             this.pnlPreviewArea.Controls.Add(this.pnlPreviewPadding);
             this.pnlPreviewArea.Controls.Add(this.pnlPreviewFooter);
@@ -97,9 +94,6 @@ namespace ImageEditor
             this.pnlPreviewArea.Name = "pnlPreviewArea";
             this.pnlPreviewArea.Size = new System.Drawing.Size(790, 760);
             this.pnlPreviewArea.TabIndex = 0;
-            // 
-            // pnlPreviewPadding
-            // 
             this.pnlPreviewPadding.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
             this.pnlPreviewPadding.Controls.Add(this.pnlPreviewCard);
             this.pnlPreviewPadding.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -108,9 +102,6 @@ namespace ImageEditor
             this.pnlPreviewPadding.Padding = new System.Windows.Forms.Padding(28, 12, 28, 16);
             this.pnlPreviewPadding.Size = new System.Drawing.Size(790, 620);
             this.pnlPreviewPadding.TabIndex = 1;
-            // 
-            // pnlPreviewCard
-            // 
             this.pnlPreviewCard.BackColor = System.Drawing.Color.FromArgb(17, 24, 39);
             this.pnlPreviewCard.BorderColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.pnlPreviewCard.BorderSize = 1;
@@ -122,9 +113,6 @@ namespace ImageEditor
             this.pnlPreviewCard.Padding = new System.Windows.Forms.Padding(2);
             this.pnlPreviewCard.Size = new System.Drawing.Size(734, 592);
             this.pnlPreviewCard.TabIndex = 0;
-            // 
-            // picPreview
-            // 
             this.picPreview.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
             this.picPreview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picPreview.Location = new System.Drawing.Point(2, 2);
@@ -133,9 +121,6 @@ namespace ImageEditor
             this.picPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picPreview.TabIndex = 0;
             this.picPreview.TabStop = false;
-            // 
-            // pnlPreviewFooter
-            // 
             this.pnlPreviewFooter.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
             this.pnlPreviewFooter.Controls.Add(this.lblDropHint);
             this.pnlPreviewFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -143,9 +128,6 @@ namespace ImageEditor
             this.pnlPreviewFooter.Name = "pnlPreviewFooter";
             this.pnlPreviewFooter.Size = new System.Drawing.Size(790, 52);
             this.pnlPreviewFooter.TabIndex = 2;
-            // 
-            // lblDropHint
-            // 
             this.lblDropHint.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblDropHint.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblDropHint.ForeColor = System.Drawing.Color.FromArgb(148, 163, 184);
@@ -155,9 +137,6 @@ namespace ImageEditor
             this.lblDropHint.TabIndex = 0;
             this.lblDropHint.Text = "Glisse-dépose une image n’importe où dans la fenêtre";
             this.lblDropHint.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // pnlPreviewHeader
-            // 
             this.pnlPreviewHeader.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
             this.pnlPreviewHeader.Controls.Add(this.lblPreviewSubtitle);
             this.pnlPreviewHeader.Controls.Add(this.lblPreviewTitle);
@@ -166,9 +145,6 @@ namespace ImageEditor
             this.pnlPreviewHeader.Name = "pnlPreviewHeader";
             this.pnlPreviewHeader.Size = new System.Drawing.Size(790, 88);
             this.pnlPreviewHeader.TabIndex = 0;
-            // 
-            // lblPreviewSubtitle
-            // 
             this.lblPreviewSubtitle.AutoSize = true;
             this.lblPreviewSubtitle.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblPreviewSubtitle.ForeColor = System.Drawing.Color.FromArgb(148, 163, 184);
@@ -177,9 +153,6 @@ namespace ImageEditor
             this.lblPreviewSubtitle.Size = new System.Drawing.Size(322, 17);
             this.lblPreviewSubtitle.TabIndex = 1;
             this.lblPreviewSubtitle.Text = "Aperçu en temps réel du recadrage et de la compression";
-            // 
-            // lblPreviewTitle
-            // 
             this.lblPreviewTitle.AutoSize = true;
             this.lblPreviewTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold);
             this.lblPreviewTitle.ForeColor = System.Drawing.Color.FromArgb(248, 250, 252);
@@ -188,9 +161,6 @@ namespace ImageEditor
             this.lblPreviewTitle.Size = new System.Drawing.Size(173, 32);
             this.lblPreviewTitle.TabIndex = 0;
             this.lblPreviewTitle.Text = "Prévisualisation";
-            // 
-            // pnlSettings
-            // 
             this.pnlSettings.BackColor = System.Drawing.Color.FromArgb(248, 250, 252);
             this.pnlSettings.Controls.Add(this.pnlSettingsScroll);
             this.pnlSettings.Controls.Add(this.pnlActionBar);
@@ -200,9 +170,6 @@ namespace ImageEditor
             this.pnlSettings.Name = "pnlSettings";
             this.pnlSettings.Size = new System.Drawing.Size(390, 760);
             this.pnlSettings.TabIndex = 1;
-            // 
-            // pnlSettingsScroll
-            // 
             this.pnlSettingsScroll.AutoScroll = true;
             this.pnlSettingsScroll.AutoScrollMinSize = new System.Drawing.Size(0, 910);
             this.pnlSettingsScroll.BackColor = System.Drawing.Color.FromArgb(248, 250, 252);
@@ -217,9 +184,6 @@ namespace ImageEditor
             this.pnlSettingsScroll.Name = "pnlSettingsScroll";
             this.pnlSettingsScroll.Size = new System.Drawing.Size(390, 550);
             this.pnlSettingsScroll.TabIndex = 1;
-            // 
-            // grpComp
-            // 
             this.grpComp.BackColor = System.Drawing.Color.White;
             this.grpComp.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.grpComp.BorderSize = 1;
@@ -235,9 +199,6 @@ namespace ImageEditor
             this.grpComp.Name = "grpComp";
             this.grpComp.Size = new System.Drawing.Size(348, 216);
             this.grpComp.TabIndex = 5;
-            // 
-            // lblCompHelp
-            // 
             this.lblCompHelp.AutoSize = true;
             this.lblCompHelp.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblCompHelp.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
@@ -246,9 +207,6 @@ namespace ImageEditor
             this.lblCompHelp.Size = new System.Drawing.Size(249, 15);
             this.lblCompHelp.TabIndex = 1;
             this.lblCompHelp.Text = "Ajuste la qualité ou impose un poids maximum.";
-            // 
-            // lblCompTitle
-            // 
             this.lblCompTitle.AutoSize = true;
             this.lblCompTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
             this.lblCompTitle.ForeColor = System.Drawing.Color.FromArgb(15, 23, 42);
@@ -257,9 +215,6 @@ namespace ImageEditor
             this.lblCompTitle.Size = new System.Drawing.Size(102, 20);
             this.lblCompTitle.TabIndex = 0;
             this.lblCompTitle.Text = "Compression";
-            // 
-            // lblQuality
-            // 
             this.lblQuality.AutoSize = true;
             this.lblQuality.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.lblQuality.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -268,11 +223,6 @@ namespace ImageEditor
             this.lblQuality.Size = new System.Drawing.Size(67, 15);
             this.lblQuality.TabIndex = 2;
             this.lblQuality.Text = "Qualité : 85";
-            // 
-            // trkQuality
-            // 
-            this.trkQuality.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.trkQuality.Location = new System.Drawing.Point(16, 87);
             this.trkQuality.Maximum = 100;
             this.trkQuality.Minimum = 1;
@@ -281,9 +231,6 @@ namespace ImageEditor
             this.trkQuality.TabIndex = 3;
             this.trkQuality.TickFrequency = 10;
             this.trkQuality.Value = 85;
-            // 
-            // chkTargetSize
-            // 
             this.chkTargetSize.AutoSize = true;
             this.chkTargetSize.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.chkTargetSize.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -293,34 +240,16 @@ namespace ImageEditor
             this.chkTargetSize.TabIndex = 4;
             this.chkTargetSize.Text = "Cibler un poids maxi";
             this.chkTargetSize.UseVisualStyleBackColor = true;
-            // 
-            // numTargetKb
-            // 
             this.numTargetKb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.numTargetKb.Enabled = false;
             this.numTargetKb.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.numTargetKb.Location = new System.Drawing.Point(22, 169);
-            this.numTargetKb.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.numTargetKb.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.numTargetKb.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            this.numTargetKb.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.numTargetKb.Name = "numTargetKb";
             this.numTargetKb.Size = new System.Drawing.Size(132, 25);
             this.numTargetKb.TabIndex = 5;
-            this.numTargetKb.Value = new decimal(new int[] {
-            256,
-            0,
-            0,
-            0});
-            // 
-            // lblKb
-            // 
+            this.numTargetKb.Value = new decimal(new int[] { 256, 0, 0, 0 });
             this.lblKb.AutoSize = true;
             this.lblKb.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.lblKb.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
@@ -329,9 +258,6 @@ namespace ImageEditor
             this.lblKb.Size = new System.Drawing.Size(22, 15);
             this.lblKb.TabIndex = 6;
             this.lblKb.Text = "Ko";
-            // 
-            // grpFormat
-            // 
             this.grpFormat.BackColor = System.Drawing.Color.White;
             this.grpFormat.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.grpFormat.BorderSize = 1;
@@ -343,9 +269,6 @@ namespace ImageEditor
             this.grpFormat.Name = "grpFormat";
             this.grpFormat.Size = new System.Drawing.Size(348, 106);
             this.grpFormat.TabIndex = 4;
-            // 
-            // lblFormatHelp
-            // 
             this.lblFormatHelp.AutoSize = true;
             this.lblFormatHelp.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblFormatHelp.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
@@ -354,9 +277,6 @@ namespace ImageEditor
             this.lblFormatHelp.Size = new System.Drawing.Size(178, 15);
             this.lblFormatHelp.TabIndex = 1;
             this.lblFormatHelp.Text = "Choisis le format du fichier final.";
-            // 
-            // lblFormatTitle
-            // 
             this.lblFormatTitle.AutoSize = true;
             this.lblFormatTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
             this.lblFormatTitle.ForeColor = System.Drawing.Color.FromArgb(15, 23, 42);
@@ -365,27 +285,15 @@ namespace ImageEditor
             this.lblFormatTitle.Size = new System.Drawing.Size(118, 20);
             this.lblFormatTitle.TabIndex = 0;
             this.lblFormatTitle.Text = "Format de sortie";
-            // 
-            // cmbFormat
-            // 
-            this.cmbFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbFormat.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbFormat.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.cmbFormat.FormattingEnabled = true;
-            this.cmbFormat.Items.AddRange(new object[] {
-            "PNG",
-            "JPEG",
-            "WebP",
-            "GIF"});
+            this.cmbFormat.Items.AddRange(new object[] { "PNG", "JPEG", "WebP", "GIF" });
             this.cmbFormat.Location = new System.Drawing.Point(22, 67);
             this.cmbFormat.Name = "cmbFormat";
             this.cmbFormat.Size = new System.Drawing.Size(304, 25);
             this.cmbFormat.TabIndex = 2;
-            // 
-            // grpCrop
-            // 
             this.grpCrop.BackColor = System.Drawing.Color.White;
             this.grpCrop.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.grpCrop.BorderSize = 1;
@@ -400,9 +308,6 @@ namespace ImageEditor
             this.grpCrop.Name = "grpCrop";
             this.grpCrop.Size = new System.Drawing.Size(348, 196);
             this.grpCrop.TabIndex = 3;
-            // 
-            // lblCropHelp
-            // 
             this.lblCropHelp.AutoSize = true;
             this.lblCropHelp.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblCropHelp.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
@@ -411,9 +316,6 @@ namespace ImageEditor
             this.lblCropHelp.Size = new System.Drawing.Size(257, 15);
             this.lblCropHelp.TabIndex = 1;
             this.lblCropHelp.Text = "Détermine la façon dont l’image remplit la zone.";
-            // 
-            // lblCropTitle
-            // 
             this.lblCropTitle.AutoSize = true;
             this.lblCropTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
             this.lblCropTitle.ForeColor = System.Drawing.Color.FromArgb(15, 23, 42);
@@ -422,9 +324,6 @@ namespace ImageEditor
             this.lblCropTitle.Size = new System.Drawing.Size(83, 20);
             this.lblCropTitle.TabIndex = 0;
             this.lblCropTitle.Text = "Recadrage";
-            // 
-            // rbNone
-            // 
             this.rbNone.AutoSize = true;
             this.rbNone.Checked = true;
             this.rbNone.Font = new System.Drawing.Font("Segoe UI", 9.5F);
@@ -436,9 +335,6 @@ namespace ImageEditor
             this.rbNone.TabStop = true;
             this.rbNone.Text = "Aucun — garder l’image";
             this.rbNone.UseVisualStyleBackColor = true;
-            // 
-            // rbCover
-            // 
             this.rbCover.AutoSize = true;
             this.rbCover.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.rbCover.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -448,9 +344,6 @@ namespace ImageEditor
             this.rbCover.TabIndex = 3;
             this.rbCover.Text = "Cover — remplir et rogner";
             this.rbCover.UseVisualStyleBackColor = true;
-            // 
-            // rbContain
-            // 
             this.rbContain.AutoSize = true;
             this.rbContain.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.rbContain.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -460,9 +353,6 @@ namespace ImageEditor
             this.rbContain.TabIndex = 4;
             this.rbContain.Text = "Contain — ajuster avec marges";
             this.rbContain.UseVisualStyleBackColor = true;
-            // 
-            // rbManual
-            // 
             this.rbManual.AutoSize = true;
             this.rbManual.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.rbManual.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -472,9 +362,6 @@ namespace ImageEditor
             this.rbManual.TabIndex = 5;
             this.rbManual.Text = "Manuel — sélectionner à la souris";
             this.rbManual.UseVisualStyleBackColor = true;
-            // 
-            // grpDim
-            // 
             this.grpDim.BackColor = System.Drawing.Color.White;
             this.grpDim.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.grpDim.BorderSize = 1;
@@ -490,9 +377,6 @@ namespace ImageEditor
             this.grpDim.Name = "grpDim";
             this.grpDim.Size = new System.Drawing.Size(348, 170);
             this.grpDim.TabIndex = 2;
-            // 
-            // lblDimHelp
-            // 
             this.lblDimHelp.AutoSize = true;
             this.lblDimHelp.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblDimHelp.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
@@ -501,9 +385,6 @@ namespace ImageEditor
             this.lblDimHelp.Size = new System.Drawing.Size(195, 15);
             this.lblDimHelp.TabIndex = 1;
             this.lblDimHelp.Text = "Définis la taille finale, exprimée en px.";
-            // 
-            // lblDimTitle
-            // 
             this.lblDimTitle.AutoSize = true;
             this.lblDimTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
             this.lblDimTitle.ForeColor = System.Drawing.Color.FromArgb(15, 23, 42);
@@ -512,9 +393,6 @@ namespace ImageEditor
             this.lblDimTitle.Size = new System.Drawing.Size(89, 20);
             this.lblDimTitle.TabIndex = 0;
             this.lblDimTitle.Text = "Dimensions";
-            // 
-            // lblW
-            // 
             this.lblW.AutoSize = true;
             this.lblW.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.lblW.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -523,35 +401,17 @@ namespace ImageEditor
             this.lblW.Size = new System.Drawing.Size(49, 15);
             this.lblW.TabIndex = 2;
             this.lblW.Text = "Largeur";
-            // 
-            // numWidth
-            // 
-            this.numWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.numWidth.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.numWidth.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.numWidth.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.numWidth.Location = new System.Drawing.Point(190, 69);
-            this.numWidth.Maximum = new decimal(new int[] {
-            30000,
-            0,
-            0,
-            0});
-            this.numWidth.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.numWidth.Maximum = new decimal(new int[] { 30000, 0, 0, 0 });
+            this.numWidth.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.numWidth.Name = "numWidth";
             this.numWidth.Size = new System.Drawing.Size(136, 25);
             this.numWidth.TabIndex = 3;
             this.numWidth.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.numWidth.Value = new decimal(new int[] {
-            512,
-            0,
-            0,
-            0});
-            // 
-            // lblH
-            // 
+            this.numWidth.Value = new decimal(new int[] { 512, 0, 0, 0 });
             this.lblH.AutoSize = true;
             this.lblH.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.lblH.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -560,35 +420,17 @@ namespace ImageEditor
             this.lblH.Size = new System.Drawing.Size(51, 15);
             this.lblH.TabIndex = 4;
             this.lblH.Text = "Hauteur";
-            // 
-            // numHeight
-            // 
-            this.numHeight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.numHeight.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.numHeight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.numHeight.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.numHeight.Location = new System.Drawing.Point(190, 104);
-            this.numHeight.Maximum = new decimal(new int[] {
-            30000,
-            0,
-            0,
-            0});
-            this.numHeight.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.numHeight.Maximum = new decimal(new int[] { 30000, 0, 0, 0 });
+            this.numHeight.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             this.numHeight.Name = "numHeight";
             this.numHeight.Size = new System.Drawing.Size(136, 25);
             this.numHeight.TabIndex = 5;
             this.numHeight.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.numHeight.Value = new decimal(new int[] {
-            512,
-            0,
-            0,
-            0});
-            // 
-            // chkKeepRatio
-            // 
+            this.numHeight.Value = new decimal(new int[] { 512, 0, 0, 0 });
             this.chkKeepRatio.AutoSize = true;
             this.chkKeepRatio.Checked = true;
             this.chkKeepRatio.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -600,9 +442,6 @@ namespace ImageEditor
             this.chkKeepRatio.TabIndex = 6;
             this.chkKeepRatio.Text = "Garder le ratio";
             this.chkKeepRatio.UseVisualStyleBackColor = true;
-            // 
-            // pnlFileInfo
-            // 
             this.pnlFileInfo.BackColor = System.Drawing.Color.White;
             this.pnlFileInfo.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.pnlFileInfo.BorderSize = 1;
@@ -614,18 +453,12 @@ namespace ImageEditor
             this.pnlFileInfo.Name = "pnlFileInfo";
             this.pnlFileInfo.Size = new System.Drawing.Size(348, 64);
             this.pnlFileInfo.TabIndex = 1;
-            // 
-            // pnlFileAccent
-            // 
             this.pnlFileAccent.BackColor = System.Drawing.Color.FromArgb(37, 99, 235);
             this.pnlFileAccent.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlFileAccent.Location = new System.Drawing.Point(0, 0);
             this.pnlFileAccent.Name = "pnlFileAccent";
             this.pnlFileAccent.Size = new System.Drawing.Size(5, 64);
             this.pnlFileAccent.TabIndex = 0;
-            // 
-            // lblFileCaption
-            // 
             this.lblFileCaption.AutoSize = true;
             this.lblFileCaption.Font = new System.Drawing.Font("Segoe UI Semibold", 8F, System.Drawing.FontStyle.Bold);
             this.lblFileCaption.ForeColor = System.Drawing.Color.FromArgb(37, 99, 235);
@@ -634,9 +467,6 @@ namespace ImageEditor
             this.lblFileCaption.Size = new System.Drawing.Size(82, 13);
             this.lblFileCaption.TabIndex = 1;
             this.lblFileCaption.Text = "IMAGE SOURCE";
-            // 
-            // lblOriginal
-            // 
             this.lblOriginal.AutoEllipsis = true;
             this.lblOriginal.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
             this.lblOriginal.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -646,9 +476,6 @@ namespace ImageEditor
             this.lblOriginal.TabIndex = 2;
             this.lblOriginal.Text = "Aucune image chargée";
             this.lblOriginal.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // btnOpen
-            // 
             this.btnOpen.BackColor = System.Drawing.Color.FromArgb(37, 99, 235);
             this.btnOpen.CornerRadius = 13;
             this.btnOpen.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -666,9 +493,6 @@ namespace ImageEditor
             this.btnOpen.TabIndex = 0;
             this.btnOpen.Text = "Ouvrir une image";
             this.btnOpen.UseVisualStyleBackColor = false;
-            // 
-            // pnlActionBar
-            // 
             this.pnlActionBar.BackColor = System.Drawing.Color.White;
             this.pnlActionBar.Controls.Add(this.btnSave);
             this.pnlActionBar.Controls.Add(this.lblEstimated);
@@ -678,11 +502,7 @@ namespace ImageEditor
             this.pnlActionBar.Padding = new System.Windows.Forms.Padding(20, 12, 20, 14);
             this.pnlActionBar.Size = new System.Drawing.Size(390, 118);
             this.pnlActionBar.TabIndex = 2;
-            // 
-            // btnSave
-            // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             this.btnSave.BackColor = System.Drawing.Color.FromArgb(22, 163, 74);
             this.btnSave.CornerRadius = 13;
             this.btnSave.Cursor = System.Windows.Forms.Cursors.Default;
@@ -701,11 +521,7 @@ namespace ImageEditor
             this.btnSave.TabIndex = 1;
             this.btnSave.Text = "Enregistrer l’image";
             this.btnSave.UseVisualStyleBackColor = false;
-            // 
-            // lblEstimated
-            // 
-            this.lblEstimated.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblEstimated.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             this.lblEstimated.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
             this.lblEstimated.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.lblEstimated.Location = new System.Drawing.Point(20, 13);
@@ -714,9 +530,6 @@ namespace ImageEditor
             this.lblEstimated.TabIndex = 0;
             this.lblEstimated.Text = "Poids estimé : —";
             this.lblEstimated.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // pnlSidebarHeader
-            // 
             this.pnlSidebarHeader.BackColor = System.Drawing.Color.White;
             this.pnlSidebarHeader.Controls.Add(this.pnlLogo);
             this.pnlSidebarHeader.Controls.Add(this.lblAppSubtitle);
@@ -726,9 +539,6 @@ namespace ImageEditor
             this.pnlSidebarHeader.Name = "pnlSidebarHeader";
             this.pnlSidebarHeader.Size = new System.Drawing.Size(390, 92);
             this.pnlSidebarHeader.TabIndex = 0;
-            // 
-            // pnlLogo
-            // 
             this.pnlLogo.BackColor = System.Drawing.Color.FromArgb(37, 99, 235);
             this.pnlLogo.BorderColor = System.Drawing.Color.FromArgb(37, 99, 235);
             this.pnlLogo.BorderSize = 0;
@@ -738,9 +548,6 @@ namespace ImageEditor
             this.pnlLogo.Name = "pnlLogo";
             this.pnlLogo.Size = new System.Drawing.Size(44, 44);
             this.pnlLogo.TabIndex = 0;
-            // 
-            // lblLogo
-            // 
             this.lblLogo.BackColor = System.Drawing.Color.Transparent;
             this.lblLogo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblLogo.Font = new System.Drawing.Font("Segoe UI Semibold", 11F, System.Drawing.FontStyle.Bold);
@@ -751,9 +558,6 @@ namespace ImageEditor
             this.lblLogo.TabIndex = 0;
             this.lblLogo.Text = "IE";
             this.lblLogo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // lblAppSubtitle
-            // 
             this.lblAppSubtitle.AutoSize = true;
             this.lblAppSubtitle.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblAppSubtitle.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
@@ -762,9 +566,6 @@ namespace ImageEditor
             this.lblAppSubtitle.Size = new System.Drawing.Size(207, 15);
             this.lblAppSubtitle.TabIndex = 2;
             this.lblAppSubtitle.Text = "Avatars, bannières et images pour le web";
-            // 
-            // lblAppName
-            // 
             this.lblAppName.AutoSize = true;
             this.lblAppName.Font = new System.Drawing.Font("Segoe UI Semibold", 16F, System.Drawing.FontStyle.Bold);
             this.lblAppName.ForeColor = System.Drawing.Color.FromArgb(15, 23, 42);
@@ -773,9 +574,6 @@ namespace ImageEditor
             this.lblAppName.Size = new System.Drawing.Size(134, 30);
             this.lblAppName.TabIndex = 1;
             this.lblAppName.Text = "ImageEditor";
-            // 
-            // MainForm
-            // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -816,7 +614,6 @@ namespace ImageEditor
             this.pnlSidebarHeader.PerformLayout();
             this.pnlLogo.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
 
         private System.Windows.Forms.Panel pnlPreviewArea;
