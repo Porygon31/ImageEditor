@@ -303,6 +303,11 @@ namespace ImageEditor
     /// </summary>
     public class PreviewPictureBox : PictureBox
     {
+        // Ces polices sont créées une seule fois puis libérées avec le contrôle.
+        // Cela évite de recréer des objets graphiques à chaque redessin de la fenêtre.
+        private readonly Font _emptyTitleFont = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
+        private readonly Font _emptySubtitleFont = new Font("Segoe UI", 9F);
+
         public PreviewPictureBox()
         {
             SetStyle(ControlStyles.UserPaint |
@@ -312,6 +317,17 @@ namespace ImageEditor
 
             SizeMode = PictureBoxSizeMode.Zoom;
             BackColor = Color.FromArgb(15, 23, 42);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _emptyTitleFont.Dispose();
+                _emptySubtitleFont.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
 
         protected override void OnPaintBackground(PaintEventArgs eventArgs)
@@ -372,7 +388,7 @@ namespace ImageEditor
             TextRenderer.DrawText(
                 eventArgs.Graphics,
                 "Dépose une image ici",
-                new Font("Segoe UI Semibold", 12F, FontStyle.Bold),
+                _emptyTitleFont,
                 titleRectangle,
                 Color.FromArgb(226, 232, 240),
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
@@ -381,7 +397,7 @@ namespace ImageEditor
             TextRenderer.DrawText(
                 eventArgs.Graphics,
                 "ou utilise le bouton « Ouvrir une image »",
-                new Font("Segoe UI", 9F),
+                _emptySubtitleFont,
                 subtitleRectangle,
                 Color.FromArgb(148, 163, 184),
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
