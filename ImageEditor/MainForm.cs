@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ImageEditor
@@ -11,11 +13,21 @@ namespace ImageEditor
         private readonly Timer _debounce = new Timer { Interval = 200 };
         private readonly ToolTip _tips = new ToolTip { AutoPopDelay = 15000, InitialDelay = 400, ReshowDelay = 100 };
 
+        // Cette source permet d'annuler logiquement l'ancien calcul lorsqu'un nouveau commence.
+        // ImageSharp ne peut pas toujours stopper un encodage déjà commencé, mais le résultat
+        // devenu inutile sera ignoré et ne remplacera pas le dernier aperçu demandé.
+        private CancellationTokenSource _updateCancellation;
+
+        // ImageProcessor contient une seule image originale partagée.
+        // Ce verrou garantit qu'un seul traitement l'utilise à la fois.
+        private readonly SemaphoreSlim _processorLock = new SemaphoreSlim(1, 1);
+
         private Bitmap _originalBmp;   // original, for manual-crop display
         private Bitmap _previewBmp;    // generated result preview (owned)
         private Size _origSize;
         private double _aspect = 1.0;
         private bool _suspend;          // guards programmatic control updates
+        private bool _closing;
 
         // Manual crop selection, in ORIGINAL image pixel coordinates.
         private Rectangle _manualRectImg;
@@ -24,11 +36,18 @@ namespace ImageEditor
         private Rectangle _rectAtDragStart;
         private DragMode _dragMode = DragMode.None;
 
-        private const int HandlePx = 8;   // handle square size (display px)
-        private const int HitPx = 7;      // hit tolerance around edges (display px)
-        private const int MinCrop = 4;    // minimum selection size (image px)
+        private const int HandlePx = 8;
+        private const int HitPx = 7;
+        private const int MinCrop = 4;
 
         private enum DragMode { None, New, Move, N, S, E, W, NE, NW, SE, SW }
+
+        // Petit objet utilisé pour renvoyer les deux résultats produits en arrière-plan.
+        private sealed class AsyncRenderResult
+        {
+            public Bitmap Preview;
+            public RenderResult Estimate;
+        }
 
         public MainForm()
         {
@@ -37,7 +56,7 @@ namespace ImageEditor
             cmbFormat.SelectedIndex = 1; // JPEG
 
             btnOpen.Click += (s, e) => OpenViaDialog();
-            btnSave.Click += (s, e) => SaveResult();
+            btnSave.Click += async (s, e) => await SaveResultAsync();
 
             numWidth.ValueChanged += (s, e) => OnWidthChanged();
             numHeight.ValueChanged += (s, e) => OnHeightChanged();
@@ -59,11 +78,17 @@ namespace ImageEditor
             picPreview.Paint += PicPreview_Paint;
             picPreview.Resize += (s, e) => picPreview.Invalidate();
 
-            this.DragEnter += MainForm_DragEnter;
-            this.DragDrop += MainForm_DragDrop;
-            this.FormClosed += (s, e) => CleanUp();
+            DragEnter += MainForm_DragEnter;
+            DragDrop += MainForm_DragDrop;
+            FormClosed += (s, e) => CleanUp();
 
-            _debounce.Tick += (s, e) => { _debounce.Stop(); DoUpdate(); };
+            // Le Timer attend 200 ms après la dernière modification.
+            // Cela évite de relancer un gros calcul à chaque petit mouvement du curseur.
+            _debounce.Tick += async (s, e) =>
+            {
+                _debounce.Stop();
+                await DoUpdateAsync();
+            };
 
             SetupToolTips();
             UpdateCompressionEnabled();
@@ -110,9 +135,22 @@ namespace ImageEditor
 
         private void LoadImage(string path)
         {
+            // Un ancien aperçu ne doit pas arriver après le chargement de la nouvelle image.
+            CancelCurrentUpdate();
+
             try
             {
-                _proc.Load(path);
+                // LoadImage reste synchrone car il n'est exécuté qu'une fois à l'ouverture.
+                // Le verrou empêche un ancien rendu de lire l'image pendant son remplacement.
+                _processorLock.Wait();
+                try
+                {
+                    _proc.Load(path);
+                }
+                finally
+                {
+                    _processorLock.Release();
+                }
             }
             catch (Exception ex)
             {
@@ -132,18 +170,28 @@ namespace ImageEditor
                 Crop = CropMode.None,
                 Format = OutputFormat.Png
             };
-            _originalBmp = _proc.RenderPreview(ids);
+
+            _processorLock.Wait();
+            try
+            {
+                _originalBmp = _proc.RenderPreview(ids);
+            }
+            finally
+            {
+                _processorLock.Release();
+            }
 
             _suspend = true;
             numWidth.Value = Clamp(_origSize.Width, (int)numWidth.Minimum, (int)numWidth.Maximum);
             numHeight.Value = Clamp(_origSize.Height, (int)numHeight.Minimum, (int)numHeight.Maximum);
             _suspend = false;
 
-            _manualRectImg = Rectangle.Empty; // no manual selection until the user draws one
+            _manualRectImg = Rectangle.Empty;
             lblOriginal.Text = string.Format("Original : {0} × {1}", _origSize.Width, _origSize.Height);
             btnSave.Enabled = true;
 
-            DoUpdate();
+            // On lance l'actualisation sans bloquer la fenêtre.
+            _ = DoUpdateAsync();
         }
 
         // ---- Settings ------------------------------------------------------
@@ -195,7 +243,6 @@ namespace ImageEditor
 
         private void OnCropModeChanged()
         {
-            // Keep-ratio only makes sense for "Aucun"; the other modes need an explicit target box.
             bool none = rbNone.Checked;
             chkKeepRatio.Enabled = none;
             if (!none) chkKeepRatio.Checked = false;
@@ -221,35 +268,105 @@ namespace ImageEditor
 
         private void ScheduleUpdate()
         {
-            if (!_proc.HasImage) return;
+            if (!_proc.HasImage || _closing) return;
+
+            // Dès qu'un réglage change, l'ancien résultat n'est plus utile.
+            CancelCurrentUpdate();
+
             _debounce.Stop();
             _debounce.Start();
         }
 
-        private void DoUpdate()
+        private void CancelCurrentUpdate()
         {
-            if (!_proc.HasImage) return;
-            var s = BuildSettings();
+            if (_updateCancellation == null) return;
+
+            _updateCancellation.Cancel();
+            _updateCancellation.Dispose();
+            _updateCancellation = null;
+        }
+
+        private async Task DoUpdateAsync()
+        {
+            if (!_proc.HasImage || _closing) return;
+
+            CancelCurrentUpdate();
+            _updateCancellation = new CancellationTokenSource();
+            CancellationToken token = _updateCancellation.Token;
+
+            // BuildSettings lit les contrôles WinForms. Il faut donc le faire sur le thread de l'interface.
+            ProcessSettings settings = BuildSettings();
+            bool manualPreview = settings.Crop == CropMode.Manual;
+
+            lblEstimated.Text = "Calcul en cours…";
 
             try
             {
-                if (s.Crop == CropMode.Manual)
+                // Task.Run envoie le travail lourd sur un thread d'arrière-plan.
+                // Pendant ce temps, la fenêtre reste réactive.
+                AsyncRenderResult result = await Task.Run(async () =>
                 {
-                    picPreview.Image = _originalBmp; // draw selection over the original
+                    token.ThrowIfCancellationRequested();
+
+                    await _processorLock.WaitAsync(token);
+                    try
+                    {
+                        token.ThrowIfCancellationRequested();
+
+                        var rendered = new AsyncRenderResult();
+
+                        // En mode manuel, l'interface affiche l'original avec le rectangle par-dessus.
+                        // Il est donc inutile de générer un second Bitmap d'aperçu.
+                        if (!manualPreview)
+                            rendered.Preview = _proc.RenderPreview(settings);
+
+                        token.ThrowIfCancellationRequested();
+                        rendered.Estimate = _proc.Render(settings);
+                        token.ThrowIfCancellationRequested();
+
+                        return rendered;
+                    }
+                    catch
+                    {
+                        throw;
+                    }
+                    finally
+                    {
+                        _processorLock.Release();
+                    }
+                }, token);
+
+                // Après await, on revient automatiquement sur le thread WinForms.
+                // On peut donc modifier les contrôles sans Invoke().
+                token.ThrowIfCancellationRequested();
+                if (_closing)
+                {
+                    result.Preview?.Dispose();
+                    return;
+                }
+
+                if (manualPreview)
+                {
+                    picPreview.Image = _originalBmp;
                 }
                 else
                 {
-                    var bmp = _proc.RenderPreview(s);
-                    SwapPreview(bmp);
+                    SwapPreview(result.Preview);
+                    result.Preview = null;
                 }
-                picPreview.Invalidate();
 
-                var res = _proc.Render(s);
-                UpdateEstimate(res, s);
+                picPreview.Invalidate();
+                UpdateEstimate(result.Estimate, settings);
+            }
+            catch (OperationCanceledException)
+            {
+                // Comportement normal : l'utilisateur a changé un réglage avant la fin.
+                // On ne montre donc aucune erreur.
             }
             catch (Exception ex)
             {
-                lblEstimated.Text = "Erreur : " + ex.Message;
+                if (!_closing)
+                    lblEstimated.Text = "Erreur : " + ex.Message;
             }
         }
 
@@ -277,13 +394,13 @@ namespace ImageEditor
 
         // ---- Saving --------------------------------------------------------
 
-        private void SaveResult()
+        private async Task SaveResultAsync()
         {
             if (!_proc.HasImage) return;
-            var s = BuildSettings();
+            var settings = BuildSettings();
 
             string ext, filter;
-            switch (s.Format)
+            switch (settings.Format)
             {
                 case OutputFormat.Png: ext = "png"; filter = "PNG|*.png"; break;
                 case OutputFormat.Webp: ext = "webp"; filter = "WebP|*.webp"; break;
@@ -298,21 +415,49 @@ namespace ImageEditor
                 dlg.FileName = "image." + ext;
                 if (dlg.ShowDialog(this) != DialogResult.OK) return;
 
+                btnSave.Enabled = false;
+                string previousText = btnSave.Text;
+                btnSave.Text = "Enregistrement…";
+
                 try
                 {
-                    var res = _proc.Render(s);
-                    File.WriteAllBytes(dlg.FileName, res.Bytes);
+                    // Le rendu et l'écriture du fichier peuvent être longs.
+                    // Ils sont donc eux aussi réalisés en arrière-plan.
+                    RenderResult result = await Task.Run(async () =>
+                    {
+                        await _processorLock.WaitAsync();
+                        try
+                        {
+                            RenderResult rendered = _proc.Render(settings);
+                            File.WriteAllBytes(dlg.FileName, rendered.Bytes);
+                            return rendered;
+                        }
+                        finally
+                        {
+                            _processorLock.Release();
+                        }
+                    });
 
-                    if (s.UseTargetSize && !res.TargetMet)
+                    if (settings.UseTargetSize && !result.TargetMet)
+                    {
                         MessageBox.Show(this,
                             "Enregistré, mais le poids cible n'a pas pu être atteint même à qualité minimale (" +
-                            FormatSize(res.SizeBytes) + ").\nRéduisez les dimensions ou augmentez la cible.",
+                            FormatSize(result.SizeBytes) + ").\nRéduisez les dimensions ou augmentez la cible.",
                             "Poids cible", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(this, "Échec de l'enregistrement :\n" + ex.Message,
                         "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                finally
+                {
+                    if (!_closing)
+                    {
+                        btnSave.Text = previousText;
+                        btnSave.Enabled = true;
+                    }
                 }
             }
         }
@@ -342,7 +487,7 @@ namespace ImageEditor
 
             if (!_dragging)
             {
-                picPreview.Cursor = CursorFor(HitTest(e.Location)); // hover feedback
+                picPreview.Cursor = CursorFor(HitTest(e.Location));
                 return;
             }
 
@@ -357,15 +502,14 @@ namespace ImageEditor
             _dragging = false;
             _dragMode = DragMode.None;
             if (_manualRectImg.Width < MinCrop || _manualRectImg.Height < MinCrop)
-                _manualRectImg = Rectangle.Empty; // discard a too-small selection
+                _manualRectImg = Rectangle.Empty;
             ScheduleUpdate();
         }
 
-        // Computes the new selection for a given drag, clamped to image bounds.
         private Rectangle ApplyDrag(DragMode mode, Rectangle start, Point from, Point to)
         {
             int l = start.Left, t = start.Top, r = start.Right, b = start.Bottom;
-            int W = _origSize.Width, H = _origSize.Height;
+            int width = _origSize.Width, height = _origSize.Height;
 
             switch (mode)
             {
@@ -379,8 +523,8 @@ namespace ImageEditor
                     l += dx; r += dx; t += dy; b += dy;
                     if (l < 0) { r -= l; l = 0; }
                     if (t < 0) { b -= t; t = 0; }
-                    if (r > W) { l -= r - W; r = W; }
-                    if (b > H) { t -= b - H; b = H; }
+                    if (r > width) { l -= r - width; r = width; }
+                    if (b > height) { t -= b - height; b = height; }
                     return Rectangle.FromLTRB(l, t, r, b);
 
                 case DragMode.W: l = to.X; break;
@@ -393,12 +537,11 @@ namespace ImageEditor
                 case DragMode.SE: r = to.X; b = to.Y; break;
             }
 
-            l = Clamp(l, 0, W); r = Clamp(r, 0, W);
-            t = Clamp(t, 0, H); b = Clamp(b, 0, H);
+            l = Clamp(l, 0, width); r = Clamp(r, 0, width);
+            t = Clamp(t, 0, height); b = Clamp(b, 0, height);
             return Rectangle.FromLTRB(Math.Min(l, r), Math.Min(t, b), Math.Max(l, r), Math.Max(t, b));
         }
 
-        // Which part of the selection the point is over (in display coords).
         private DragMode HitTest(Point disp)
         {
             if (_manualRectImg.Width <= 0 || _manualRectImg.Height <= 0) return DragMode.New;
@@ -424,9 +567,9 @@ namespace ImageEditor
             return DragMode.New;
         }
 
-        private static Cursor CursorFor(DragMode m)
+        private static Cursor CursorFor(DragMode mode)
         {
-            switch (m)
+            switch (mode)
             {
                 case DragMode.N:
                 case DragMode.S: return Cursors.SizeNS;
@@ -450,69 +593,67 @@ namespace ImageEditor
 
             if (_manualRectImg.Width <= 0 || _manualRectImg.Height <= 0)
             {
-                // No selection yet: prompt the user to draw one.
                 const string hint = "Cliquez-glissez pour dessiner la zone à recadrer";
                 using (var font = new Font("Segoe UI", 10f, FontStyle.Bold))
                 {
-                    SizeF ts = e.Graphics.MeasureString(hint, font);
-                    float hx = dispArea.X + (dispArea.Width - ts.Width) / 2f;
-                    float hy = dispArea.Y + 10;
-                    using (var bg = new SolidBrush(Color.FromArgb(160, 0, 0, 0)))
-                        e.Graphics.FillRectangle(bg, hx - 6, hy - 3, ts.Width + 12, ts.Height + 6);
-                    e.Graphics.DrawString(hint, font, Brushes.White, hx, hy);
+                    SizeF textSize = e.Graphics.MeasureString(hint, font);
+                    float x = dispArea.X + (dispArea.Width - textSize.Width) / 2f;
+                    float y = dispArea.Y + 10;
+                    using (var background = new SolidBrush(Color.FromArgb(160, 0, 0, 0)))
+                        e.Graphics.FillRectangle(background, x - 6, y - 3, textSize.Width + 12, textSize.Height + 6);
+                    e.Graphics.DrawString(hint, font, Brushes.White, x, y);
                 }
                 return;
             }
 
-            RectangleF disp = dispArea;
-
-            RectangleF r = ImageRectToDisplay(_manualRectImg);
-            var g = e.Graphics;
+            RectangleF selection = ImageRectToDisplay(_manualRectImg);
+            var graphics = e.Graphics;
 
             using (var pen = new Pen(Color.OrangeRed, 2f))
             using (var dimBrush = new SolidBrush(Color.FromArgb(110, 0, 0, 0)))
             using (var handleBrush = new SolidBrush(Color.White))
             using (var handlePen = new Pen(Color.OrangeRed, 1.5f))
             {
-                // Darken everything outside the selection.
-                using (Region outside = new Region(disp))
+                using (Region outside = new Region(dispArea))
                 {
-                    outside.Exclude(r);
-                    g.FillRegion(dimBrush, outside);
-                }
-                g.DrawRectangle(pen, r.X, r.Y, r.Width, r.Height);
-
-                // 8 resize handles.
-                foreach (PointF hp in HandlePoints(r))
-                {
-                    var hr = new RectangleF(hp.X - HandlePx / 2f, hp.Y - HandlePx / 2f, HandlePx, HandlePx);
-                    g.FillRectangle(handleBrush, hr);
-                    g.DrawRectangle(handlePen, hr.X, hr.Y, hr.Width, hr.Height);
+                    outside.Exclude(selection);
+                    graphics.FillRegion(dimBrush, outside);
                 }
 
-                // Live dimension label (image px).
-                string txt = _manualRectImg.Width + " × " + _manualRectImg.Height + " px";
+                graphics.DrawRectangle(pen, selection.X, selection.Y, selection.Width, selection.Height);
+
+                foreach (PointF point in HandlePoints(selection))
+                {
+                    var handle = new RectangleF(point.X - HandlePx / 2f, point.Y - HandlePx / 2f, HandlePx, HandlePx);
+                    graphics.FillRectangle(handleBrush, handle);
+                    graphics.DrawRectangle(handlePen, handle.X, handle.Y, handle.Width, handle.Height);
+                }
+
+                string text = _manualRectImg.Width + " × " + _manualRectImg.Height + " px";
                 using (var font = new Font("Segoe UI", 9f, FontStyle.Bold))
                 {
-                    SizeF ts = g.MeasureString(txt, font);
-                    float lx = r.X + 3;
-                    float ly = r.Y + 3;
-                    if (ly + ts.Height > disp.Bottom) ly = r.Bottom - ts.Height - 3;
-                    using (var bg = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
-                        g.FillRectangle(bg, lx - 2, ly - 1, ts.Width + 4, ts.Height + 2);
-                    g.DrawString(txt, font, Brushes.White, lx, ly);
+                    SizeF textSize = graphics.MeasureString(text, font);
+                    float x = selection.X + 3;
+                    float y = selection.Y + 3;
+                    if (y + textSize.Height > dispArea.Bottom)
+                        y = selection.Bottom - textSize.Height - 3;
+
+                    using (var background = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
+                        graphics.FillRectangle(background, x - 2, y - 1, textSize.Width + 4, textSize.Height + 2);
+                    graphics.DrawString(text, font, Brushes.White, x, y);
                 }
             }
         }
 
         private static PointF[] HandlePoints(RectangleF r)
         {
-            float mx = r.X + r.Width / 2f, my = r.Y + r.Height / 2f;
+            float middleX = r.X + r.Width / 2f;
+            float middleY = r.Y + r.Height / 2f;
             return new[]
             {
-                new PointF(r.Left, r.Top),  new PointF(mx, r.Top),    new PointF(r.Right, r.Top),
-                new PointF(r.Left, my),                                new PointF(r.Right, my),
-                new PointF(r.Left, r.Bottom), new PointF(mx, r.Bottom), new PointF(r.Right, r.Bottom)
+                new PointF(r.Left, r.Top), new PointF(middleX, r.Top), new PointF(r.Right, r.Top),
+                new PointF(r.Left, middleY), new PointF(r.Right, middleY),
+                new PointF(r.Left, r.Bottom), new PointF(middleX, r.Bottom), new PointF(r.Right, r.Bottom)
             };
         }
 
@@ -520,37 +661,42 @@ namespace ImageEditor
         {
             RectangleF disp = GetImageDisplayRect(_origSize);
             if (disp.Width <= 0 || _origSize.Width <= 0) return RectangleF.Empty;
-            float sx = disp.Width / _origSize.Width;
-            float sy = disp.Height / _origSize.Height;
+            float scaleX = disp.Width / _origSize.Width;
+            float scaleY = disp.Height / _origSize.Height;
             return new RectangleF(
-                disp.X + imgRect.X * sx, disp.Y + imgRect.Y * sy,
-                imgRect.Width * sx, imgRect.Height * sy);
+                disp.X + imgRect.X * scaleX,
+                disp.Y + imgRect.Y * scaleY,
+                imgRect.Width * scaleX,
+                imgRect.Height * scaleY);
         }
 
         private RectangleF GetImageDisplayRect(Size imgSize)
         {
-            var cs = picPreview.ClientSize;
-            if (imgSize.Width <= 0 || imgSize.Height <= 0 || cs.Width <= 0 || cs.Height <= 0)
+            var clientSize = picPreview.ClientSize;
+            if (imgSize.Width <= 0 || imgSize.Height <= 0 || clientSize.Width <= 0 || clientSize.Height <= 0)
                 return RectangleF.Empty;
 
-            float scale = Math.Min((float)cs.Width / imgSize.Width, (float)cs.Height / imgSize.Height);
-            float w = imgSize.Width * scale;
-            float h = imgSize.Height * scale;
-            return new RectangleF((cs.Width - w) / 2f, (cs.Height - h) / 2f, w, h);
+            float scale = Math.Min((float)clientSize.Width / imgSize.Width, (float)clientSize.Height / imgSize.Height);
+            float width = imgSize.Width * scale;
+            float height = imgSize.Height * scale;
+            return new RectangleF((clientSize.Width - width) / 2f, (clientSize.Height - height) / 2f, width, height);
         }
 
-        private Point DisplayToImage(Point p, bool clamp = true)
+        private Point DisplayToImage(Point point, bool clamp = true)
         {
-            RectangleF r = GetImageDisplayRect(_origSize);
-            if (r.Width <= 0 || r.Height <= 0) return Point.Empty;
-            int ix = (int)Math.Round((p.X - r.X) / r.Width * _origSize.Width);
-            int iy = (int)Math.Round((p.Y - r.Y) / r.Height * _origSize.Height);
+            RectangleF display = GetImageDisplayRect(_origSize);
+            if (display.Width <= 0 || display.Height <= 0) return Point.Empty;
+
+            int x = (int)Math.Round((point.X - display.X) / display.Width * _origSize.Width);
+            int y = (int)Math.Round((point.Y - display.Y) / display.Height * _origSize.Height);
+
             if (clamp)
             {
-                ix = Clamp(ix, 0, _origSize.Width);
-                iy = Clamp(iy, 0, _origSize.Height);
+                x = Clamp(x, 0, _origSize.Width);
+                y = Clamp(y, 0, _origSize.Height);
             }
-            return new Point(ix, iy);
+
+            return new Point(x, y);
         }
 
         // ---- Drag & drop ---------------------------------------------------
@@ -570,7 +716,10 @@ namespace ImageEditor
 
         // ---- Helpers -------------------------------------------------------
 
-        private static int Clamp(int v, int lo, int hi) => v < lo ? lo : (v > hi ? hi : v);
+        private static int Clamp(int value, int minimum, int maximum)
+        {
+            return value < minimum ? minimum : (value > maximum ? maximum : value);
+        }
 
         private static string FormatSize(long bytes)
         {
@@ -582,12 +731,25 @@ namespace ImageEditor
 
         private void CleanUp()
         {
+            _closing = true;
             _debounce.Stop();
+            CancelCurrentUpdate();
             _tips.Dispose();
             picPreview.Image = null;
             _previewBmp?.Dispose();
             _originalBmp?.Dispose();
-            _proc.Dispose();
+
+            // On évite de supprimer ImageProcessor pendant qu'un thread l'utilise encore.
+            _processorLock.Wait();
+            try
+            {
+                _proc.Dispose();
+            }
+            finally
+            {
+                _processorLock.Release();
+                _processorLock.Dispose();
+            }
         }
     }
 }
