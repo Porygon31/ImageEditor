@@ -108,7 +108,9 @@ namespace ImageEditor
             if (Width <= 0 || Height <= 0)
                 return;
 
-            var rectangle = new Rectangle(0, 0, Width, Height);
+            // Width - 1 et Height - 1 gardent le tracé à l'intérieur du contrôle.
+            // Sans cela, la dernière ligne peut être coupée d'un pixel par Windows.
+            var rectangle = new Rectangle(0, 0, Width - 1, Height - 1);
             using (GraphicsPath path = UiDrawing.CreateRoundedRectangle(rectangle, _cornerRadius))
             {
                 Region previousRegion = Region;
