@@ -220,8 +220,6 @@ namespace ImageEditor
             // 
             // grpComp
             // 
-            this.grpComp.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.grpComp.BackColor = System.Drawing.Color.White;
             this.grpComp.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.grpComp.BorderSize = 1;
@@ -334,8 +332,6 @@ namespace ImageEditor
             // 
             // grpFormat
             // 
-            this.grpFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.grpFormat.BackColor = System.Drawing.Color.White;
             this.grpFormat.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.grpFormat.BorderSize = 1;
@@ -390,8 +386,6 @@ namespace ImageEditor
             // 
             // grpCrop
             // 
-            this.grpCrop.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.grpCrop.BackColor = System.Drawing.Color.White;
             this.grpCrop.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.grpCrop.BorderSize = 1;
@@ -481,8 +475,6 @@ namespace ImageEditor
             // 
             // grpDim
             // 
-            this.grpDim.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.grpDim.BackColor = System.Drawing.Color.White;
             this.grpDim.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.grpDim.BorderSize = 1;
@@ -611,8 +603,6 @@ namespace ImageEditor
             // 
             // pnlFileInfo
             // 
-            this.pnlFileInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlFileInfo.BackColor = System.Drawing.Color.White;
             this.pnlFileInfo.BorderColor = System.Drawing.Color.FromArgb(226, 232, 240);
             this.pnlFileInfo.BorderSize = 1;
@@ -647,8 +637,6 @@ namespace ImageEditor
             // 
             // lblOriginal
             // 
-            this.lblOriginal.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.lblOriginal.AutoEllipsis = true;
             this.lblOriginal.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
             this.lblOriginal.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -661,8 +649,6 @@ namespace ImageEditor
             // 
             // btnOpen
             // 
-            this.btnOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOpen.BackColor = System.Drawing.Color.FromArgb(37, 99, 235);
             this.btnOpen.CornerRadius = 13;
             this.btnOpen.Cursor = System.Windows.Forms.Cursors.Hand;
