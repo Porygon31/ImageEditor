@@ -1,23 +1,77 @@
+using System;
+
 namespace ImageEditor
 {
     /// <summary>
-    /// Timer utilisé par l'interface WinForms.
+    /// Petit wrapper autour du Timer WinForms utilisé par l'interface.
     ///
-    /// Pourquoi cette petite classe existe ?
-    /// MainForm.cs utilise à la fois :
-    /// - System.Threading, pour l'annulation des traitements asynchrones ;
-    /// - System.Windows.Forms, pour l'interface graphique.
+    /// Pourquoi ne pas hériter directement de System.Windows.Forms.Timer ?
+    /// Un Timer WinForms est aussi un "Component". Visual Studio modifiait donc
+    /// automatiquement le fichier .csproj pour ajouter :
     ///
-    /// Ces deux bibliothèques contiennent une classe appelée "Timer".
-    /// Sans cette précision, le compilateur ne sait pas laquelle choisir.
+    ///     <SubType>Component</SubType>
     ///
-    /// En héritant explicitement de System.Windows.Forms.Timer, tous les
-    /// "Timer" utilisés dans le namespace ImageEditor correspondent maintenant
-    /// au timer prévu pour l'interface graphique.
+    /// Cette modification revenait après chaque annulation Git.
+    ///
+    /// Ici, la classe contient le vrai Timer au lieu d'en hériter. Pour le reste
+    /// du programme, son utilisation reste identique : Interval, Tick, Start,
+    /// Stop et Dispose sont simplement transmis au Timer WinForms interne.
     /// </summary>
-    internal sealed class Timer : System.Windows.Forms.Timer
+    internal sealed class Timer : IDisposable
     {
-        // Aucun code supplémentaire n'est nécessaire.
-        // Toute la logique est déjà fournie par System.Windows.Forms.Timer.
+        // Le vrai Timer WinForms reste privé : seul ce petit wrapper l'utilise.
+        private readonly System.Windows.Forms.Timer _innerTimer =
+            new System.Windows.Forms.Timer();
+
+        /// <summary>
+        /// Temps d'attente entre deux déclenchements, en millisecondes.
+        /// </summary>
+        public int Interval
+        {
+            get { return _innerTimer.Interval; }
+            set { _innerTimer.Interval = value; }
+        }
+
+        /// <summary>
+        /// Indique si le Timer est actuellement actif.
+        /// </summary>
+        public bool Enabled
+        {
+            get { return _innerTimer.Enabled; }
+            set { _innerTimer.Enabled = value; }
+        }
+
+        /// <summary>
+        /// Événement déclenché lorsque le délai du Timer est écoulé.
+        /// </summary>
+        public event EventHandler Tick
+        {
+            add { _innerTimer.Tick += value; }
+            remove { _innerTimer.Tick -= value; }
+        }
+
+        /// <summary>
+        /// Démarre ou redémarre le Timer.
+        /// </summary>
+        public void Start()
+        {
+            _innerTimer.Start();
+        }
+
+        /// <summary>
+        /// Arrête le Timer sans le supprimer.
+        /// </summary>
+        public void Stop()
+        {
+            _innerTimer.Stop();
+        }
+
+        /// <summary>
+        /// Libère le Timer WinForms interne quand il n'est plus utilisé.
+        /// </summary>
+        public void Dispose()
+        {
+            _innerTimer.Dispose();
+        }
     }
 }
