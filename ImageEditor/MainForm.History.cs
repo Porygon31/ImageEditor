@@ -225,7 +225,10 @@ namespace ImageEditor
 
             try
             {
-                BeginInvoke(new Action(EnsureHistoryMatchesCurrentImage));
+                // EnsureHistoryMatchesCurrentImage retourne un booléen.
+                // Une expression lambda permet de l'appeler depuis un Action (qui retourne void)
+                // tout en ignorant volontairement cette valeur de retour ici.
+                BeginInvoke(new Action(() => EnsureHistoryMatchesCurrentImage()));
             }
             catch (InvalidOperationException)
             {
