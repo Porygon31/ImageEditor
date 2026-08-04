@@ -46,7 +46,7 @@
     <Compile Include="ImageProcessor.cs" />
     <Compile Include="ModernControls.cs" />
     <Compile Include="UiTimer.cs">
-      <SubType>Code</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
